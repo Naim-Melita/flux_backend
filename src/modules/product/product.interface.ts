@@ -8,3 +8,4 @@ export interface Barcode {
     createdAt: Date;
     updatedAt: Date;
 }
+
