@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 
-const barcodeSchema = new mongoose.Schema({
+
+export interface ProductDocument extends Document {
+  barcode: string;
+  name: string;
+  imageUrl: string;
+}
+
+const productSchema = new mongoose.Schema({
     barcode: {
       type: String,
       required: true
@@ -22,4 +29,4 @@ const barcodeSchema = new mongoose.Schema({
   }
 );
 
-export default mongoose.model("Barcode", barcodeSchema);
+export default mongoose.model<ProductDocument>("Product", productSchema);

@@ -15,7 +15,7 @@ const options = {
       }
     ]
   },
-  apis: ["./routes/*.js"], // rutas donde pondremos anotaciones
+  apis: ["./routes/*.ts"], // rutas donde pondremos anotaciones
 };
 
 const specs = swaggerJsdoc(options);
