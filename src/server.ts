@@ -8,12 +8,8 @@ import router from "./routes/index";
 import { errorHandler } from "./middleware/errorHandler";
 dotenv.config();
 
-// Logs de variables de entorno
-console.log("AUTH_API_KEY:", process.env.AUTH_API_KEY);
-console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
-console.log("CLOUD_API_KEY:", process.env.CLOUD_API_KEY);
-console.log("CLOUD_API_SECRET:", process.env.CLOUD_API_SECRET);
-console.log("AUTH_API_KEY cargada:", process.env.AUTH_API_KEY);
+console.log("AUTH_API_KEY cargada:", Boolean(process.env.AUTH_API_KEY));
+console.log("DATABASE_URL cargada:", Boolean(process.env.DATABASE_URL));
 
 const server = express();
 
@@ -34,8 +30,7 @@ const limiter = rateLimit({
 });
 server.use(limiter);
 
-// Conexión a MongoDB
-
+// Conexión a PostgreSQL via Prisma
 connectDB();
 
 // Rutas API

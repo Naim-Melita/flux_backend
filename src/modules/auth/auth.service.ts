@@ -1,7 +1,7 @@
-import User from "../../models/User";
 import bcrypt from "bcrypt";
 import { JwtPayload, LoginResponse } from "./auth.interface";
 import jwt from "jsonwebtoken";
+import { prisma } from "../../lib/prisma";
 
 type LoginInput = {
   email: string;
@@ -25,7 +25,7 @@ export async function login({ email, password }: LoginInput) {
     throw new Error("Email and password are required");
   }
 
-  const user = await User.findOne({ email });
+  const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
     throw new Error("Invalid credentials");
@@ -38,18 +38,21 @@ export async function login({ email, password }: LoginInput) {
   }
 
   const payload: JwtPayload = {
-    userId: user._id.toString(),
+    id: user.id,
     email: user.email ?? null,
+    name: user.name,
+    last_name: user.last_name,
   };
 
   const token = signToken(payload);
 
   const response: LoginResponse = {
-    token,
     user: {
-      id: payload.userId,
+      id: payload.id,
       email: user.email,
       name: user.name,
+      last_name: user.last_name,
+      token,
     },
   };
 
@@ -67,7 +70,7 @@ export async function register({
   last_name: string;
   password: string;
 }) {
-  const userExists = await User.findOne({ email });
+  const userExists = await prisma.user.findUnique({ where: { email } });
   if (userExists) {
     throw new Error("User already exists");
   }
@@ -75,16 +78,31 @@ export async function register({
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
 
-  const user = await User.create({
-    name,
-    email,
-    last_name,
-    password: password,
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      last_name,
+      password,
+    },
   });
-  return {
-    id: user._id,
-    email: user.email,
+
+  const payload: JwtPayload = {
+    id: user.id,
+    email: user.email ?? null,
     name: user.name,
     last_name: user.last_name,
+  };
+
+  const token = signToken(payload);
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      last_name: user.last_name,
+      token,
+    },
   };
 }

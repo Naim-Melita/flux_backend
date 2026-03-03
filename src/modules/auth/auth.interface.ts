@@ -1,5 +1,5 @@
 export type UserType = {
-  _id: string;
+  id: string;
   name: string;
   last_name: string;
   email: string;
@@ -7,15 +7,18 @@ export type UserType = {
 };
 
 export type JwtPayload = {
-  userId: string;
+  id: string;
   email: string | null;
+  name: string | null;
+  last_name: string | null; 
 };
 
 export type LoginResponse = {
-  token: string;
   user: {
     id: string;
     email: string;
     name: string;
+    last_name: string;
+    token: string;
   };
 };

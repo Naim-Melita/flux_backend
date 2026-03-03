@@ -9,7 +9,8 @@ router.post("/login", loginHandler);
 router.post("/register", registerHandler);
 
 router.get('/me', authMiddleware, (req, res) => {
-    return res.json(req.user);
+    console.log('eskere');
+    return res.json({user: req.user});
 });
 
 

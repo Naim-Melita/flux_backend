@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  name        String
+  last_name   String
+  email       String        @unique
+  password    String
+  userProducts UserProduct[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  barcode   String   @unique
+  name      String?
+  scans     Int      @default(0)
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserProduct {
+  id        String   @id @default(uuid())
+  barcode   String
+  name      String?
+  imageUrl  String?
+  stock     Int      @default(0)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

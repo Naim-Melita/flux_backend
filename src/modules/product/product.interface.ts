@@ -1,6 +1,7 @@
 
 export interface Barcode {
     _id: string;
+    id: string;
     barcode: string;
     name: string;
     scans: number;
@@ -8,4 +9,3 @@ export interface Barcode {
     createdAt: Date;
     updatedAt: Date;
 }
-

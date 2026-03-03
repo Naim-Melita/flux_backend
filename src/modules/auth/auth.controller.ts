@@ -24,6 +24,7 @@ export async function registerHandler(
   try {
     const { name, last_name, email, password } = req.body ?? {};
 
+    console.log(req.body);
     if (!email || !password || !name || !last_name) {
       return res.status(400).json({ error: "Fields are required" });
     }
@@ -31,6 +32,7 @@ export async function registerHandler(
     const result = await register({ name, email, last_name, password });
     return res.json(result);
   } catch (error: any) {
+    console.log(error);
     return res.status(409).json({ error: error.message });
   }
 }

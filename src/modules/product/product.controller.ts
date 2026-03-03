@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 import {
   createProductService,
@@ -104,8 +103,7 @@ export async function getProductByIdHandler(
 ): Promise<Response> {
   try {
     const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+    if (!id) {
       return res.status(400).json({ error: "ID inválido" });
     }
 
@@ -155,7 +153,7 @@ export async function updateProductHandler(
 
   try {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+    if (!id) {
       return res.status(400).json({ error: "ID inválido" });
     }
 
@@ -191,7 +189,7 @@ export async function deleteProductHandler(
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id as string)) {
+    if (!id) {
       return res.status(400).json({ error: "ID inválido" });
     }
 

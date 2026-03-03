@@ -24,7 +24,12 @@ export function authMiddleware(
     if (typeof payload !== "object" || payload === null) {
       return res.status(401).json({ error: "unauthorized" });
     }
-    req.user = payload as { userId: string; email?: string | null };
+    req.user = payload as {
+      id: string;
+      email?: string;
+      name?: string;
+      last_name?: string | null;
+    };
     return next();
   } catch {
     return res.status(401).json({ error: "unauthorized" });
