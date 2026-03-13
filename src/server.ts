@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import connectDB from "./config/db";
 import productRoutes from "./modules/product/product.routes"; // 👈 importamos las rutas de productos
 import { errorHandler } from "./middleware/errorHandler";
+import router from "./routes";
 
 dotenv.config();
 
@@ -34,7 +35,7 @@ server.use(limiter);
 connectDB();
 
 // Rutas API
-server.use("/api", productRoutes); // 👈 aquí montamos las rutas de productos
+server.use("/", router); // 👈 aquí montamos las rutas de productos
 
 // Middleware de manejo centralizado de errores
 server.use(errorHandler);

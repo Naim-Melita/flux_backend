@@ -10,7 +10,7 @@ const router: Router = Router();
 router.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Rutas
-router.use("/products", productRoutes);
+router.use("/", productRoutes);
 
 router.use("/auth", authRoutes);
 

@@ -7,14 +7,15 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  name        String
-  last_name   String
-  email       String        @unique
-  password    String
-  userProducts UserProduct[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id               String            @id @default(uuid())
+  name             String
+  last_name        String
+  email            String            @unique
+  password         String
+  userProducts     UserProduct[]
+  catalogItems     UserCatalogItem[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model ProductType {
@@ -26,27 +27,57 @@ model ProductType {
 }
 
 model Product {
-  id             String       @id @default(uuid())
-  barcode        String       @unique
-  name           String?
-  scans          Int          @default(0)
-  imageUrl       String?
-  category       String? 
-  productTypeId  String?
-  productType    ProductType? @relation(fields: [productTypeId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id               String            @id @default(uuid())
+  barcode          String            @unique
+  name             String?
+  scans            Int               @default(0)
+  imageUrl         String?
+  category         String?
+  productTypeId    String?
+  productType      ProductType?      @relation(fields: [productTypeId], references: [id])
+  userCatalogItems UserCatalogItem[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([barcode])
 }
 
-
 model UserProduct {
-  id        String   @id @default(uuid())
-  barcode   String
-  name      String?
-  imageUrl  String?
-  stock     Int      @default(0)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String
+  barcode       String
+  name          String
+  imageUrl      String?
+  category      String?
+  stock         Int      @default(0)
+  priceInCents  Int?
+  favorite      Boolean  @default(false)
+  notes         String?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, barcode])
+  @@index([userId])
+  @@index([barcode])
+}
+
+model UserCatalogItem {
+  id              String   @id @default(uuid())
+  userId          String
+  productId       String
+  stock           Int      @default(0)
+  customName      String?
+  customImageUrl  String?
+  priceInCents    Int?
+  favorite        Boolean  @default(false)
+  notes           String?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }
