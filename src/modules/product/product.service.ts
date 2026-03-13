@@ -11,12 +11,14 @@ export interface CreateProductInput {
   barcode: string;
   name?: string;
   imageUrl?: string;
+  category?: string;
 }
 
 export interface UpdateProductInput {
   barcode?: string;
   name?: string;
   imageUrl?: string;
+  category?: string;
 }
 
 function toBarcodeDTO(product: {
@@ -25,6 +27,8 @@ function toBarcodeDTO(product: {
   name: string | null;
   scans: number;
   imageUrl: string | null;
+  category: string | null;
+  productTypeId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): Barcode {
@@ -35,6 +39,8 @@ function toBarcodeDTO(product: {
     name: product.name ?? "",
     scans: product.scans,
     imageUrl: product.imageUrl ?? "",
+    category: product.category ?? "",
+    productTypeId: product.productTypeId ?? undefined,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };
@@ -108,7 +114,12 @@ export async function createProductService(
   data: CreateProductInput,
 ): Promise<Barcode> {
   const created = await prisma.product.create({
-    data,
+    data: {
+      barcode: data.barcode,
+      name: data.name,
+      imageUrl: data.imageUrl,
+      category: data.category,
+    },
   });
   return toBarcodeDTO(created);
 }

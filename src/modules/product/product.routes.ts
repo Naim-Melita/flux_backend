@@ -11,41 +11,19 @@ import {
   getProductByBarcodeHandler,
   getProductByIdHandler,
   getStatsHandler,
-  getTopProductsHandler,
+  getTopHandler,
   getTotalCountHandler,
   updateProductHandler,
 } from "./product.controller";
 
 const router = express.Router();
 
-/* --- RUTAS FIJAS ANTES DE LA RUTA POR ID --- */
-
-// Top barcodes
-router.get("/top", authApiKey, getTopProductsHandler);
-
-// Stats globales
-router.get("/stats", authApiKey, getStatsHandler);
-
-// Buscar por código exacto
-router.get("/search/:barcode", authApiKey, getProductByBarcodeHandler);
-
-// Últimos barcodes
-router.get("/latest", authApiKey, getLatestProductsHandler);
-
-// Conteo total
-router.get("/count", authApiKey, getTotalCountHandler);
-
-/* --- RUTA GENERAL PARA TODOS LOS BARCODES --- */
-router.get("/", authApiKey, getAllProductsHandler);
-
-/* --- RUTA POR ID --- */
-router.get("/:id", authApiKey, getProductByIdHandler);
-
-/* --- POST --- */
+/* --- RUTAS ESPECÍFICAS --- */
+// Crear producto
 router.post(
-  "/",
+  "/products",
   authApiKey,
-  upload.single("image"), // <-- primero multer
+  upload.single("image"),
   [
     body("barcode")
       .notEmpty()
@@ -57,22 +35,46 @@ router.post(
   createProductHandler,
 );
 
+// Listar todos los productos
+router.get("/products", authApiKey, getAllProductsHandler);
+
+// Top barcodes
+router.get("/products/top", authApiKey, getTopHandler);
+
+// Stats globales
+router.get("/products/stats", authApiKey, getStatsHandler);
+
+// Buscar por código exacto
+router.get("/products/search/:barcode", authApiKey, getProductByBarcodeHandler);
+
+// Últimos barcodes
+router.get("/products/latest", authApiKey, getLatestProductsHandler);
+
+// Conteo total
+router.get("/products/count", authApiKey, getTotalCountHandler);
+
+router.get("/products/stats", authApiKey, getStatsHandler);
+
+
+/* --- RUTA POR ID --- */
+router.get("/products/:id", authApiKey, getProductByIdHandler);
+
 /* --- PUT --- */
 router.put(
-  "/:id",
+  "/products/:id",
   authApiKey,
-  upload.single("image"), // <-- primero multer
+  upload.single("image"),
   [
-    body("barcode")
-      .optional()
-      .isString()
-      .withMessage("El código debe ser texto"),
+    body("barcode").optional().isString().withMessage("El código debe ser texto"),
     body("name").optional().isString().withMessage("El nombre debe ser texto"),
   ],
   updateProductHandler,
 );
+
 /* --- DELETE --- */
-router.delete("/:id", authApiKey, deleteProductHandler);
-router.post("/fix-urls", fixProductUrlsHandler);
+router.delete("/products/:id", authApiKey, deleteProductHandler);
+
+// Fix URLs
+router.post("/products/fix-urls", authApiKey, fixProductUrlsHandler);
 
 export default router;

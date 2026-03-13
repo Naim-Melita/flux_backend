@@ -6,6 +6,8 @@ export interface Barcode {
     name: string;
     scans: number;
     imageUrl: string;
+    category: string;
+    productTypeId?: string; // 👈 nuevo campo
     createdAt: Date;
     updatedAt: Date;
 }

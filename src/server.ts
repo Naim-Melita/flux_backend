@@ -4,23 +4,23 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import connectDB from "./config/db";
-import router from "./routes/index";
+import productRoutes from "./modules/product/product.routes"; // 👈 importamos las rutas de productos
 import { errorHandler } from "./middleware/errorHandler";
+
 dotenv.config();
 
 console.log("AUTH_API_KEY cargada:", Boolean(process.env.AUTH_API_KEY));
 console.log("DATABASE_URL cargada:", Boolean(process.env.DATABASE_URL));
 
 const server = express();
-
-server.use(helmet()); // 🔒 cabeceras de seguridad
 server.use(cors({
-  origin: "*", // luego tu dominio real del front
+  origin: "http://localhost:5173", // luego tu dominio real del front
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "x-api-key"]
 }));
-server.use(express.json());
+server.use(helmet()); // 🔒 cabeceras de seguridad
 
+server.use(express.json());
 
 // Rate limiting (máx 100 requests cada 15 min por IP)
 const limiter = rateLimit({
@@ -34,8 +34,7 @@ server.use(limiter);
 connectDB();
 
 // Rutas API
-server.use(router);
-
+server.use("/api", productRoutes); // 👈 aquí montamos las rutas de productos
 
 // Middleware de manejo centralizado de errores
 server.use(errorHandler);

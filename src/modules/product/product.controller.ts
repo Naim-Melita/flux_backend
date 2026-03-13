@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
+import { prisma } from "../../lib/prisma";
 import {
   createProductService,
   deleteProductService,
@@ -13,7 +14,7 @@ import {
   getTotalCountService,
   type UpdateProductInput,
   updateProductService,
-} from "./prduct.service";
+} from "./product.service";
 
 export async function getTopProductsHandler(
   req: Request,
@@ -28,18 +29,18 @@ export async function getTopProductsHandler(
   }
 }
 
-export async function getStatsHandler(
-  req: Request,
-  res: Response,
-): Promise<Response> {
-  try {
-    const stats = await getStatsService();
-    return res.json(stats);
-  } catch (error: any) {
-    console.error("STATS ERROR:", error);
-    return res.status(500).json({ error: error.message });
-  }
-}
+// export async function getStatsHandler(
+//   req: Request,
+//   res: Response,
+// ): Promise<Response> {
+//   try {
+//     const stats = await getStatsService();
+//     return res.json(stats);
+//   } catch (error: any) {
+//     console.error("STATS ERROR:", error);
+//     return res.status(500).json({ error: error.message });
+//   }
+// }
 
 export async function getProductByBarcodeHandler(
   req: Request,
@@ -83,6 +84,12 @@ export async function getTotalCountHandler(
     return res.status(500).json({ error: error.message });
   }
 }
+export type CreateProductInput = {
+  barcode: string;
+  name?: string;
+  imageUrl?: string;
+  category?: string; // 👈 nuevo campo
+};
 
 export async function getAllProductsHandler(
   req: Request,
@@ -129,18 +136,23 @@ export async function createProductHandler(
   }
 
   try {
-    const { barcode, name } = req.body;
+    console.log("BODY RECIBIDO:", req.body); // 👈 log para ver qué llega
+    const { barcode, name, category } = req.body;
+
     const newProduct = await createProductService({
       barcode,
       name,
+      category, // 👈 nuevo campo
       imageUrl: req.file?.secure_url || req.file?.path,
     });
+
     return res.status(201).json(newProduct);
   } catch (error: any) {
     console.error("CONTROLLER ERROR:", error);
     return res.status(500).json({ error: error.message });
   }
 }
+
 
 export async function updateProductHandler(
   req: Request,
@@ -219,3 +231,38 @@ export async function fixProductUrlsHandler(
     return res.status(500).json({ error: error.message });
   }
 }
+
+// Obtener estadísticas simples (ejemplo: cantidad de productos)
+export const getStatsHandler = async (req: Request, res: Response) => {
+  try {
+    const totalProducts = await prisma.product.count();
+    const totalCategories = await prisma.productType.count();
+    const latestProducts = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+
+    res.json({
+      totalProducts,
+      totalCategories,
+      latest: latestProducts, // 👈 ahora sí existe stats.latest
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Obtener top barcodes (ejemplo: productos más escaneados)
+export const getTopHandler = async (req: Request, res: Response) => {
+  try {
+    const topProducts = await prisma.product.findMany({
+      orderBy: { scans: "desc" },
+      take: 5,
+    });
+
+    res.json(topProducts);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
